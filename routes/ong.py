@@ -2,7 +2,6 @@ from bson import ObjectId
 from fastapi.encoders import jsonable_encoder
 from fastapi.routing import APIRouter
 from config.db import conn
-from models.pessoa import Pessoa
 from models.ong import Ong
 from models.usuario import Usuario
 from schemas.ong import ongEntity, ongsEntity
