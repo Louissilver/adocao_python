@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from routes.user import user
 from routes.pet import pet
 from routes.ong import ong
 from routes.associado import associado
