@@ -1,6 +1,12 @@
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/63754409/138783487-b3e1c4e1-629c-4a0f-80d9-a5a6ff689910.png" />
+</p>
+
+# Projeto adoCão
+
 Documentação [FastAPI](https://fastapi.tiangolo.com/).
 
-# Instalação
+## Instalação
 
 Clone este repositório
 
@@ -31,7 +37,7 @@ Crie um ambiente virtual no diretório
   .\venv\Scripts\activate
   ```
 
-# Dependências
+## Dependências
   
 Utilize o `pip` para baixar as dependências do projeto:
 
@@ -39,7 +45,7 @@ Utilize o `pip` para baixar as dependências do projeto:
 pip install -r requirements.txt
 ```
 
-# Banco de dados
+## Banco de dados
 
 A aplicação utiliza **MongoDB** e criará automaticamente o banco de dados, mas
 para isso é necessário já possuir o MongoDB instalado. 
@@ -47,7 +53,7 @@ para isso é necessário já possuir o MongoDB instalado.
 Para instalar, basta seguir o tutorial de instalação:
 ```https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/```
 
-# Execução
+## Execução
 
 Para executar o servidor use:
 
