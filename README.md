@@ -6,6 +6,15 @@
 
 Documentação [FastAPI](https://fastapi.tiangolo.com/).
 
+## Tabela de conteúdos
+=================
+<!--ts-->
+   * [Instalação](#instalação)
+   * [Dependências](#dependências)
+   * [Banco de dados](#banco-de-dados)
+   * [Execução](#execução)
+<!--te-->
+
 ## Instalação
 
 Clone este repositório
