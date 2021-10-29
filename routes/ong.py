@@ -14,7 +14,7 @@ async def find_all_ongs():
     return ongsEntity(conn.local.ong.find())
 
 
-@ong.get('/{id}')
+@ong.get('/ongs/{id}')
 async def find_one_ong(id):
     return ongEntity(conn.local.ong.find_one({"_id": ObjectId(id)}))
 
@@ -45,7 +45,7 @@ async def create_ong(ong: Ong, usuario: Usuario):
     return f"ONG {ong.nome} inserida com sucesso!"
 
 
-@ong.put('/adocao/solicitacao/{id}')
+@ong.put('/ongs/{id}')
 async def update_ong(id, ong: Ong):
     conn.local.ong.find_one_and_update({"_id": ObjectId(id)}, {
         "$set": dict(ong)
@@ -53,6 +53,6 @@ async def update_ong(id, ong: Ong):
     return ongEntity(conn.local.ong.find_one({"_id": ObjectId(id)}))
 
 
-@ong.delete('/adocao/solicitacao/{id}')
+@ong.delete('/ongs/{id}')
 async def delete_ong(id):
     return ongEntity(conn.local.ong.find_one_and_delete({"_id": ObjectId(id)}))

@@ -1,6 +1,10 @@
 from typing import Optional
+from bson import ObjectId
+from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from datetime import datetime
+from config.db import conn
+from schemas.pet import petEntity, petsEntity
 
 
 class Pet(BaseModel):
@@ -15,6 +19,29 @@ class Pet(BaseModel):
     observacoes: str
     id_ong: Optional[str]
     id_associado: Optional[str]
+
+    @staticmethod
+    def retornar_todos_pets():
+        return petsEntity(conn.local.pet.find())
+
+    @staticmethod
+    def retornar_um_pet(id):
+        return petEntity(conn.local.pet.find_one({"_id": ObjectId(id)}))
+
+    @staticmethod
+    def retornar_nome_pet(id):
+        return petEntity(conn.local.pet.find_one({"_id": ObjectId(id)}))["nome"]
+
+    def inserir_um_pet(self):
+        conn.local.pet.insert_one(jsonable_encoder(self))
+
+    def atualizar_um_pet(self, id):
+        conn.local.pet.find_one_and_update(
+            {"_id": ObjectId(id)}, {"$set": dict(self)})
+
+    @staticmethod
+    def deletar_um_pet(id):
+        petEntity(conn.local.pet.find_one_and_delete({"_id": ObjectId(id)}))
 
     class Config:
         schema_extra = {

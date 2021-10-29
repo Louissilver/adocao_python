@@ -11,28 +11,28 @@ pet = APIRouter()
 
 @pet.get('/pets')
 async def find_all_pets():
-    return petsEntity(conn.local.pet.find())
+    return Pet.retornar_todos_pets()
 
 
 @pet.get('/pets/{id}')
 async def find_all_pets(id):
-    return petEntity(conn.local.pet.find_one({"_id": ObjectId(id)}))
+    return Pet.retornar_um_pet(id)
 
 
 @pet.post("/pets")
 async def create_pet(pet: Pet):
-    conn.local.pet.insert_one(jsonable_encoder(pet))
-    return f"Pet {pet.nome} cadastrado com sucesso!"
+    pet.inserir_um_pet()
+    return f"O pet {pet.nome} foi cadastrado com sucesso!"
 
 
-@pet.put('/{id}')
+@pet.put('/pets/{id}')
 async def update_pet(id, pet: Pet):
-    conn.local.pet.find_one_and_update({"_id": ObjectId(id)}, {
-        "$set": dict(pet)
-    })
-    return petEntity(conn.local.pet.find_one({"_id": ObjectId(id)}))
+    pet.atualizar_um_pet(id)
+    return f"O pet {pet.nome} foi atualizado com sucesso!"
 
 
-@pet.delete('/{id}')
+@pet.delete('/pets/{id}')
 async def delete_pet(id):
-    return petEntity(conn.local.pet.find_one_and_delete({"_id": ObjectId(id)}))
+    pet_deletado = Pet.retornar_nome_pet(id)
+    Pet.deletar_um_pet(id)
+    return f"O pet {pet_deletado} foi excluído com sucesso!"
