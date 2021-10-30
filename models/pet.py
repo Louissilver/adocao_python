@@ -28,10 +28,6 @@ class Pet(BaseModel):
     def retornar_um_pet(id):
         return petEntity(conn.local.pet.find_one({"_id": ObjectId(id)}))
 
-    @staticmethod
-    def retornar_nome_pet(id):
-        return petEntity(conn.local.pet.find_one({"_id": ObjectId(id)}))["nome"]
-
     def inserir_um_pet(self):
         conn.local.pet.insert_one(jsonable_encoder(self))
 
@@ -40,8 +36,12 @@ class Pet(BaseModel):
             {"_id": ObjectId(id)}, {"$set": dict(self)})
 
     @staticmethod
+    def retornar_nome_pet(id):
+        return petEntity(conn.local.pet.find_one({"_id": ObjectId(id)}))["nome"]
+
+    @staticmethod
     def deletar_um_pet(id):
-        petEntity(conn.local.pet.find_one_and_delete({"_id": ObjectId(id)}))
+        conn.local.pet.find_one_and_delete({"_id": ObjectId(id)})
 
     class Config:
         schema_extra = {

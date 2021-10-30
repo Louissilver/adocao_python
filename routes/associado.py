@@ -1,63 +1,49 @@
-from bson import ObjectId
-from fastapi.encoders import jsonable_encoder
 from fastapi.routing import APIRouter
-from config.db import conn
 from models.associado import Associado
+from models.pessoa import Pessoa
 from models.usuario import Usuario
-from schemas.associado import associadoEntity, associadosEntity
 
 associado = APIRouter()
 
 
 @associado.get('/associados')
 async def find_all_associados():
-    return associadosEntity(conn.local.associado.find())
+    return Associado.retornar_associados()
 
 
 @associado.get('/associados/{id}')
 async def find_one_associado(id):
-    return associadoEntity(conn.local.associado.find_one({"_id": ObjectId(id)}))
+    return Associado.retornar_uma_associado(id)
 
 
 @associado.post("/associados")
 async def create_associado(associado: Associado, usuario: Usuario):
-    _id_pessoa = conn.local.pessoa.insert_one({
-        "nome": associado.nome,
-        "email": associado.email,
-        "telefone": associado.telefone,
-        "endereco": jsonable_encoder(associado.endereco)
-    })
+    _id_pessoa = associado.inserir_pessoa()
     id_pessoa = str(_id_pessoa.inserted_id)
-    _id_associado = conn.local.associado.insert_one(
-        jsonable_encoder(associado))
+
+    _id_associado = associado.inserir_associado()
     id_associado = str(_id_associado.inserted_id)
-    conn.local.associado.find_one_and_update({"_id": ObjectId(id_associado)}, {
-        "$set": {
-            "id_pessoa": id_pessoa
-        }})
-    _id_usuario = conn.local.usuario.insert_one(
-        jsonable_encoder(usuario))
+
+    _id_usuario = usuario.inserir_usuario()
     id_usuario = str(_id_usuario.inserted_id)
-    conn.local.usuario.find_one_and_update({"_id": ObjectId(id_usuario)}, {
-        "$set": {
-            "id_pessoa": id_pessoa
-        }})
-    return f"Pessoa {associado.nome} inserida com sucesso!"
+
+    associado.inserir_id_pessoa(id_associado, id_pessoa)
+    usuario.inserir_id_pessoa(id_usuario, id_pessoa)
+
+    return f"O associado {associado.nome} inserido com sucesso!"
 
 
 @associado.put('/associados/{id}')
 async def update_associado(id, associado: Associado):
-    conn.local.associado.find_one_and_update({"_id": ObjectId(id)}, {
-        "$set": dict(associado)
-    })
-    return associadoEntity(conn.local.associado.find_one({"_id": ObjectId(id)}))
+    associado.atualizar_associado(id)
+    return f"O associado {associado.nome} foi alterado com sucesso!"
 
 
 @associado.delete('/associados/{id}')
 async def delete_associado(id):
-    pessoa = dict(conn.local.associado.find_one({"_id": ObjectId(id)}))
-    id_pessoa = str(pessoa["id_pessoa"])
-    conn.local.usuario.find_one_and_delete({"id_pessoa": id_pessoa})
-    conn.local.pessoa.find_one_and_delete({"_id": ObjectId(id_pessoa)})
-    conn.local.associado.find_one_and_delete({"_id": ObjectId(id)})
-    return f"Pessoa {id_pessoa}"
+    associado = Associado.retornar_nome_associado(id)
+    id_pessoa = Associado.retornar_id_pessoa(id)
+    Usuario.deletar_usuario(id_pessoa)
+    Pessoa.deletar_pessoa(id_pessoa)
+    Associado.deletar_associado(id)
+    return f"O associado {associado} foi excluido com sucesso!"

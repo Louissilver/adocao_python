@@ -1,10 +1,5 @@
-from bson import ObjectId
 from fastapi import APIRouter
-from fastapi.encoders import jsonable_encoder
-
 from models.pet import Pet
-from config.db import conn
-from schemas.pet import petEntity, petsEntity
 
 pet = APIRouter()
 
