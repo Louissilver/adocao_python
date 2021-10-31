@@ -51,7 +51,7 @@ class Pessoa(BaseModel):
         return valor
 
     def inserir_pessoa(self):
-        return conn.local.pessoa.insert_one({
+        return conn.adocao.pessoa.insert_one({
             "nome": self.nome,
             "email": self.email,
             "telefone": self.telefone,
@@ -60,7 +60,7 @@ class Pessoa(BaseModel):
 
     @staticmethod
     def deletar_pessoa(id_pessoa):
-        conn.local.pessoa.find_one_and_delete({"_id": ObjectId(id_pessoa)})
+        conn.adocao.pessoa.find_one_and_delete({"_id": ObjectId(id_pessoa)})
 
     class Config:
         schema_extra = {

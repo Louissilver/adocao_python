@@ -51,34 +51,34 @@ class Usuario(BaseModel):
 
     @staticmethod
     def retornar_usuarios():
-        return usuariosEntity(conn.local.usuario.find())
+        return usuariosEntity(conn.adocao.usuario.find())
 
     @staticmethod
     def retornar_logins_existentes():
         logins = []
-        for usuario in usuariosEntity(conn.local.usuario.find()):
+        for usuario in usuariosEntity(conn.adocao.usuario.find()):
             logins.append(usuario["login"])
         return logins
 
     @staticmethod
     def retornar_um_usuario(id):
-        return usuarioEntity(conn.local.usuario.find_one({"_id": ObjectId(id)}))
+        return usuarioEntity(conn.adocao.usuario.find_one({"_id": ObjectId(id)}))
 
     def inserir_usuario(self):
-        return conn.local.usuario.insert_one({
+        return conn.adocao.usuario.insert_one({
             "login": self.login,
             "senha": self.senha,
             "tipo_usuario": self.tipo_usuario
         })
 
     def inserir_id_pessoa(self, id_usuario, id_pessoa):
-        conn.local.usuario.find_one_and_update({"_id": ObjectId(id_usuario)}, {
+        conn.adocao.usuario.find_one_and_update({"_id": ObjectId(id_usuario)}, {
             "$set": {
                 "id_pessoa": id_pessoa
             }})
 
     def atualizar_usuario(self, id):
-        conn.local.usuario.find_one_and_update({"_id": ObjectId(id)}, {
+        conn.adocao.usuario.find_one_and_update({"_id": ObjectId(id)}, {
             "$set": {
                 "login": self.login,
                 "senha": self.senha,
@@ -88,7 +88,7 @@ class Usuario(BaseModel):
 
     @staticmethod
     def deletar_usuario(id_pessoa):
-        conn.local.usuario.find_one_and_delete({"id_pessoa": id_pessoa})
+        conn.adocao.usuario.find_one_and_delete({"id_pessoa": id_pessoa})
 
     class Config:
         schema_extra = {

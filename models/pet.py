@@ -116,17 +116,17 @@ class Pet(BaseModel):
 
     @staticmethod
     def retornar_todos_pets():
-        return petsEntity(conn.local.pet.find())
+        return petsEntity(conn.adocao.pet.find())
 
     @staticmethod
     def ser_adotado(solicitacao):
-        conn.local.pet.find_one_and_update({"_id": ObjectId(solicitacao["id_pet"])}, {
+        conn.adocao.pet.find_one_and_update({"_id": ObjectId(solicitacao["id_pet"])}, {
             "$set": {"adotado": True,
                      "id_associado": solicitacao["id_associado"]}})
 
     @staticmethod
     def retornar_um_pet(id):
-        return petEntity(conn.local.pet.find_one({"_id": ObjectId(id)}))
+        return petEntity(conn.adocao.pet.find_one({"_id": ObjectId(id)}))
 
     def inserir_um_pet(self):
         data = self.dataNascimento.split('/')
@@ -135,7 +135,7 @@ class Pet(BaseModel):
             mes = int(data[1])
         else:
             mes = int(data[1].replace("0", ""))
-        conn.local.pet.insert_one({
+        conn.adocao.pet.insert_one({
             "nome": self.nome,
             "especie": self.especie,
             "raca": self.raca,
@@ -155,7 +155,7 @@ class Pet(BaseModel):
             mes = int(data[1])
         else:
             mes = int(data[1].replace("0", ""))
-        conn.local.pet.find_one_and_update(
+        conn.adocao.pet.find_one_and_update(
             {"_id": ObjectId(id)}, {"$set": {
                 "nome": self.nome,
                 "especie": self.especie,
@@ -171,11 +171,11 @@ class Pet(BaseModel):
 
     @staticmethod
     def retornar_nome_pet(id):
-        return petEntity(conn.local.pet.find_one({"_id": ObjectId(id)}))["nome"]
+        return petEntity(conn.adocao.pet.find_one({"_id": ObjectId(id)}))["nome"]
 
     @staticmethod
     def deletar_um_pet(id):
-        conn.local.pet.find_one_and_delete({"_id": ObjectId(id)})
+        conn.adocao.pet.find_one_and_delete({"_id": ObjectId(id)})
 
     class Config:
         schema_extra = {

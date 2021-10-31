@@ -56,14 +56,14 @@ class Solicitacao_Adocao(BaseModel):
 
     @staticmethod
     def retornar_solicitacoes():
-        return solicitacoes_adocaoEntity(conn.local.solicitacao_adocao.find())
+        return solicitacoes_adocaoEntity(conn.adocao.solicitacao_adocao.find())
 
     @staticmethod
     def retornar_uma_solicitacao(id):
-        return solicitacao_adocaoEntity(conn.local.solicitacao_adocao.find_one({"_id": ObjectId(id)}))
+        return solicitacao_adocaoEntity(conn.adocao.solicitacao_adocao.find_one({"_id": ObjectId(id)}))
 
     def inserir_solicitacao(self):
-        return conn.local.solicitacao_adocao.insert_one({
+        return conn.adocao.solicitacao_adocao.insert_one({
             "id_associado": self.id_associado,
             "id_ong": self.id_ong,
             "id_pet": self.id_pet,
@@ -74,7 +74,7 @@ class Solicitacao_Adocao(BaseModel):
         })
 
     def atualizar_solicitacao(self, id):
-        conn.local.solicitacao_adocao.find_one_and_update({"_id": ObjectId(id)}, {
+        conn.adocao.solicitacao_adocao.find_one_and_update({"_id": ObjectId(id)}, {
             "$set": {
                 "id_associado": self.id_associado,
                 "id_ong": self.id_ong,
@@ -89,7 +89,7 @@ class Solicitacao_Adocao(BaseModel):
         if solicitacao["aprovado"]:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="A solicitação já foi aprovada")
-        conn.local.solicitacao_adocao.find_one_and_update({"_id": ObjectId(id)}, {
+        conn.adocao.solicitacao_adocao.find_one_and_update({"_id": ObjectId(id)}, {
             "$set": {
                 "aprovado": True
             }
@@ -105,7 +105,7 @@ class Solicitacao_Adocao(BaseModel):
         if solicitacao["aprovado"]:
             Associado.incluir_pet(solicitacao)
             Pet.ser_adotado(solicitacao)
-        conn.local.solicitacao_adocao.find_one_and_update({"_id": ObjectId(id)}, {
+        conn.adocao.solicitacao_adocao.find_one_and_update({"_id": ObjectId(id)}, {
             "$set": {
                 "finalizado": True
             }
@@ -114,11 +114,11 @@ class Solicitacao_Adocao(BaseModel):
 
     @staticmethod
     def retornar_id_solicitacao(id):
-        return solicitacao_adocaoEntity(conn.local.solicitacao_adocao.find_one({"_id": ObjectId(id)}))["id"]
+        return solicitacao_adocaoEntity(conn.adocao.solicitacao_adocao.find_one({"_id": ObjectId(id)}))["id"]
 
     @staticmethod
     def deletar_solicitacao(id):
-        conn.local.solicitacao_adocao.find_one_and_delete(
+        conn.adocao.solicitacao_adocao.find_one_and_delete(
             {"_id": ObjectId(id)})
 
     class Config:

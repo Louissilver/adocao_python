@@ -28,14 +28,14 @@ class Ong(Pessoa):
 
     @staticmethod
     def retornar_ongs():
-        return ongsEntity(conn.local.ong.find())
+        return ongsEntity(conn.adocao.ong.find())
 
     @staticmethod
     def retornar_uma_ong(id):
-        return ongEntity(conn.local.ong.find_one({"_id": ObjectId(id)}))
+        return ongEntity(conn.adocao.ong.find_one({"_id": ObjectId(id)}))
 
     def inserir_ong(self):
-        return conn.local.ong.insert_one({
+        return conn.adocao.ong.insert_one({
             "cnpj": self.cnpj,
             "nome": self.nome,
             "email": self.email,
@@ -44,13 +44,13 @@ class Ong(Pessoa):
         })
 
     def inserir_id_pessoa(self, id_ong, id_pessoa):
-        return conn.local.ong.find_one_and_update({"_id": ObjectId(id_ong)}, {
+        return conn.adocao.ong.find_one_and_update({"_id": ObjectId(id_ong)}, {
             "$set": {
                 "id_pessoa": id_pessoa
             }})
 
     def atualizar_ong(self, id):
-        conn.local.ong.find_one_and_update({"_id": ObjectId(id)}, {
+        conn.adocao.ong.find_one_and_update({"_id": ObjectId(id)}, {
             "$set": {
                 "cnpj": self.cnpj,
                 "nome": self.nome,
@@ -62,17 +62,17 @@ class Ong(Pessoa):
 
     @staticmethod
     def retornar_nome_ong(id):
-        return ongEntity(conn.local.ong.find_one(
+        return ongEntity(conn.adocao.ong.find_one(
             {"_id": ObjectId(id)}))["nome"]
 
     @staticmethod
     def retornar_id_pessoa(id):
-        return ongEntity(conn.local.ong.find_one(
+        return ongEntity(conn.adocao.ong.find_one(
             {"_id": ObjectId(id)}))["id_pessoa"]
 
     @staticmethod
     def deletar_ong(id):
-        conn.local.ong.find_one_and_delete({"_id": ObjectId(id)})
+        conn.adocao.ong.find_one_and_delete({"_id": ObjectId(id)})
 
     class Config:
         schema_extra = {

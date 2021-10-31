@@ -4,6 +4,7 @@ from routes.ong import ong
 from routes.associado import associado
 from routes.solicitacao_adocao import solicitacao_adocao
 from routes.usuario import usuario
+from config.db import conn
 
 app = FastAPI()
 

@@ -53,7 +53,7 @@ class Associado(Pessoa):
 
     @staticmethod
     def retornar_associados():
-        return associadosEntity(conn.local.associado.find())
+        return associadosEntity(conn.adocao.associado.find())
 
     @staticmethod
     def retornar_um_associado(id):
@@ -63,7 +63,7 @@ class Associado(Pessoa):
         if id not in ids:
             raise HTTPException(
                 status_code=404, detail="Não foi possível encontrar nenhum associado com esse id.")
-        return associadoEntity(conn.local.associado.find_one({"_id": ObjectId(id)}))
+        return associadoEntity(conn.adocao.associado.find_one({"_id": ObjectId(id)}))
 
     def inserir_associado(self):
         data = self.dataNascimento.split('/')
@@ -72,7 +72,7 @@ class Associado(Pessoa):
             mes = int(data[1])
         else:
             mes = int(data[1].replace("0", ""))
-        return conn.local.associado.insert_one({
+        return conn.adocao.associado.insert_one({
             "nome": self.nome,
             "email": self.email,
             "telefone": self.telefone,
@@ -83,7 +83,7 @@ class Associado(Pessoa):
         })
 
     def inserir_id_pessoa(self, id_associado, id_pessoa):
-        return conn.local.associado.find_one_and_update({"_id": ObjectId(id_associado)}, {
+        return conn.adocao.associado.find_one_and_update({"_id": ObjectId(id_associado)}, {
             "$set": {
                 "id_pessoa": id_pessoa
             }})
@@ -95,7 +95,7 @@ class Associado(Pessoa):
             mes = int(data[1])
         else:
             mes = int(data[1].replace("0", ""))
-        conn.local.associado.find_one_and_update({"_id": ObjectId(id)}, {
+        conn.adocao.associado.find_one_and_update({"_id": ObjectId(id)}, {
             "$set": {
                 "nome": self.nome,
                 "email": self.email,
@@ -109,21 +109,21 @@ class Associado(Pessoa):
 
     @staticmethod
     def retornar_nome_associado(id):
-        return associadoEntity(conn.local.associado.find_one({"_id": ObjectId(id)}))["nome"]
+        return associadoEntity(conn.adocao.associado.find_one({"_id": ObjectId(id)}))["nome"]
 
     @staticmethod
     def incluir_pet(solicitacao):
-        conn.local.associado.find_one_and_update({"_id": ObjectId(solicitacao["id_associado"])}, {
+        conn.adocao.associado.find_one_and_update({"_id": ObjectId(solicitacao["id_associado"])}, {
             "$push": {"animaisAdotados": solicitacao["id_pet"]}})
 
     @staticmethod
     def deletar_associado(id):
-        conn.local.associado.find_one_and_delete(
+        conn.adocao.associado.find_one_and_delete(
             {"_id": ObjectId(id)})
 
     @staticmethod
     def retornar_id_pessoa(id):
-        return associadoEntity(conn.local.associado.find_one(
+        return associadoEntity(conn.adocao.associado.find_one(
             {"_id": ObjectId(id)}))["id_pessoa"]
 
     class Config:
