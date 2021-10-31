@@ -1,4 +1,6 @@
+from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
+from fastapi import status
 from models.ong import Ong
 from models.pessoa import Pessoa
 from models.usuario import Usuario
@@ -6,17 +8,17 @@ from models.usuario import Usuario
 ong = APIRouter()
 
 
-@ong.get('/ongs')
+@ong.get('/ongs', status_code=status.HTTP_200_OK)
 async def find_all_ongs():
     return Ong.retornar_ongs()
 
 
-@ong.get('/ongs/{id}')
+@ong.get('/ongs/{id}', status_code=status.HTTP_200_OK)
 async def find_one_ong(id):
     return Ong.retornar_uma_ong(id)
 
 
-@ong.post("/ongs")
+@ong.post("/ongs", status_code=status.HTTP_200_OK)
 async def create_ong(ong: Ong, usuario: Usuario):
     _id_pessoa = ong.inserir_pessoa()
     id_pessoa = str(_id_pessoa.inserted_id)
@@ -24,6 +26,10 @@ async def create_ong(ong: Ong, usuario: Usuario):
     _id_ong = ong.inserir_ong()
     id_ong = str(_id_ong.inserted_id)
 
+    usuario.tipo_usuario = "ONG"
+    if usuario.login in Usuario.retornar_logins_existentes():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="O login informado já está em uso.")
     _id_usuario = usuario.inserir_usuario()
     id_usuario = str(_id_usuario.inserted_id)
 
@@ -33,13 +39,13 @@ async def create_ong(ong: Ong, usuario: Usuario):
     return f"ONG {ong.nome} inserida com sucesso!"
 
 
-@ong.put('/ongs/{id}')
+@ong.put('/ongs/{id}', status_code=status.HTTP_200_OK)
 async def update_ong(id, ong: Ong):
     ong.atualizar_ong(id)
     return f"A ONG {ong.nome} foi alterada com sucesso!"
 
 
-@ong.delete('/ongs/{id}')
+@ong.delete('/ongs/{id}', status_code=status.HTTP_200_OK)
 async def delete_ong(id):
     ong = Ong.retornar_nome_ong(id)
     id_pessoa = Ong.retornar_id_pessoa(id)

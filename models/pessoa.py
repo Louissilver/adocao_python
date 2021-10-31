@@ -1,9 +1,12 @@
 from bson import ObjectId
 from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel
+from fastapi.exceptions import HTTPException
+from pydantic import BaseModel, validator
 from config.db import conn
 from models.endereco import Endereco
-from schemas.pessoa import pessoaEntity
+from email_validator import EmailNotValidError, validate_email
+import re
+from fastapi import status
 
 
 class Pessoa(BaseModel):
@@ -11,6 +14,41 @@ class Pessoa(BaseModel):
     email: str
     telefone: str
     endereco: Endereco
+
+    @validator('nome')
+    def validar_nome(cls, valor):
+        valor = valor.strip()
+        if valor == '':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo nome é obrigatório.")
+        if len(valor) < 3:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O nome deve conter, pelo menos, 3 caracteres.")
+        return valor
+
+    @validator('email', pre=True)
+    def validar_email(cls, valor):
+        valor = valor.strip()
+        if valor == '':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo e-mail é obrigatório.")
+        try:
+            valid = validate_email(valor)
+            valor = valid.email
+        except EmailNotValidError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O e-mail informado não é válido. Tente o formato 'email@example.com'")
+        return valor
+
+    @validator('telefone', pre=True)
+    def validar_telefone(cls, valor):
+        valor = valor.strip()
+        padrao = "^\(?\d{2}\)?[\s-]?[\s9]?\d{4}-?\d{4}$"
+        validacao = re.match(padrao, valor)
+        if not validacao:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O telefone informado não é válido. Tente o formato (XX)XXXXX-XXXX")
+        return valor
 
     def inserir_pessoa(self):
         return conn.local.pessoa.insert_one({
@@ -29,9 +67,9 @@ class Pessoa(BaseModel):
             "example": {
                 "nome": "Luís Fernando da Silveira",
                 "email": "luis.202020718@unilasalle.edu.br",
-                "telefone": "51995814416",
+                "telefone": "(51)99581-4416",
                 "endereco": {
-                    "cep": "93600000",
+                    "cep": "93600-000",
                     "logradouro": "Av. das Rosas",
                     "numero": 1410,
                     "bairro": "Floresta",
