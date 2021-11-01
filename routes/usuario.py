@@ -1,3 +1,4 @@
+from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 from models.usuario import Usuario
 from fastapi import status
@@ -17,5 +18,8 @@ async def find_one_usuario(id):
 
 @usuario.put('/usuarios/{id}', status_code=status.HTTP_200_OK)
 async def update_usuario(id, usuario: Usuario):
+    if usuario.login in Usuario.retornar_logins_existentes(id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="O login informado já está em uso.")
     usuario.atualizar_usuario(id)
     return f"O usuário {usuario.login} foi alterado com sucesso!"

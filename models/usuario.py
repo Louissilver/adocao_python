@@ -54,10 +54,12 @@ class Usuario(BaseModel):
         return usuariosEntity(conn.adocao.usuario.find())
 
     @staticmethod
-    def retornar_logins_existentes():
+    def retornar_logins_existentes(id=None):
         logins = []
         for usuario in usuariosEntity(conn.adocao.usuario.find()):
             logins.append(usuario["login"])
+        if id != None:
+            logins.remove(Usuario.retornar_um_usuario(id)["login"])
         return logins
 
     @staticmethod

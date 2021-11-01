@@ -20,6 +20,9 @@ async def find_one_associado(id):
 
 @associado.post("/associados", status_code=status.HTTP_200_OK)
 async def create_associado(associado: Associado, usuario: Usuario):
+    if associado.email in Associado.retornar_emails_existentes():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="O e-mail informado já está em uso.")
     _id_pessoa = associado.inserir_pessoa()
     id_pessoa = str(_id_pessoa.inserted_id)
 
@@ -41,6 +44,9 @@ async def create_associado(associado: Associado, usuario: Usuario):
 
 @associado.put('/associados/{id}', status_code=status.HTTP_200_OK)
 async def update_associado(id, associado: Associado):
+    if associado.email in Pessoa.retornar_emails_existentes(id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="O e-mail informado já está em uso.")
     associado.atualizar_associado(id)
     return f"O associado {associado.nome} foi alterado com sucesso!"
 

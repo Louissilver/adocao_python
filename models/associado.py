@@ -1,6 +1,6 @@
 import re
 from typing import List, Optional
-from datetime import date, datetime
+from datetime import datetime
 from pydantic import validator
 from bson import ObjectId
 from fastapi import HTTPException, status
@@ -8,6 +8,7 @@ from fastapi.encoders import jsonable_encoder
 from schemas.associado import associadoEntity, associadosEntity
 from config.db import conn
 from models.pessoa import Pessoa
+from schemas.pessoa import pessoaEntity, pessoasEntity
 
 
 class Associado(Pessoa):
@@ -125,6 +126,19 @@ class Associado(Pessoa):
     def retornar_id_pessoa(id):
         return associadoEntity(conn.adocao.associado.find_one(
             {"_id": ObjectId(id)}))["id_pessoa"]
+
+    @staticmethod
+    def retornar_emails_existentes(id=None):
+        emails = []
+        if conn.adocao.pessoa.find().count() > 0:
+            pessoas = pessoasEntity(conn.adocao.pessoa.find())
+            for pessoa in pessoas:
+                emails.append(pessoa["email"])
+            if id != None:
+                id_pessoa = Associado.retornar_id_pessoa(id)
+                emails.remove(
+                    Associado.retornar_uma_pessoa(id_pessoa)["email"])
+        return emails
 
     class Config:
         schema_extra = {

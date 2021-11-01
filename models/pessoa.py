@@ -7,6 +7,7 @@ from models.endereco import Endereco
 from email_validator import EmailNotValidError, validate_email
 import re
 from fastapi import status
+from schemas.pessoa import pessoaEntity, pessoasEntity
 
 
 class Pessoa(BaseModel):
@@ -57,6 +58,22 @@ class Pessoa(BaseModel):
             "telefone": self.telefone,
             "endereco": jsonable_encoder(self.endereco)
         })
+
+    @staticmethod
+    def retornar_uma_pessoa(id):
+        return pessoaEntity(conn.adocao.pessoa.find_one({"_id": ObjectId(id)}))
+
+    @staticmethod
+    def retornar_emails_existentes(id=None):
+        emails = []
+        if conn.adocao.pessoa.find().count() > 0:
+            pessoas = pessoasEntity(conn.adocao.pessoa.find())
+            for pessoa in pessoas:
+                emails.append(pessoa["email"])
+            if id != None:
+                emails.remove(
+                    Pessoa.retornar_uma_pessoa(id)["email"])
+        return emails
 
     @staticmethod
     def deletar_pessoa(id_pessoa):

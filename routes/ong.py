@@ -20,6 +20,9 @@ async def find_one_ong(id):
 
 @ong.post("/ongs", status_code=status.HTTP_200_OK)
 async def create_ong(ong: Ong, usuario: Usuario):
+    if ong.email in Ong.retornar_emails_existentes():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="O e-mail informado já está em uso.")
     _id_pessoa = ong.inserir_pessoa()
     id_pessoa = str(_id_pessoa.inserted_id)
 
@@ -41,6 +44,9 @@ async def create_ong(ong: Ong, usuario: Usuario):
 
 @ong.put('/ongs/{id}', status_code=status.HTTP_200_OK)
 async def update_ong(id, ong: Ong):
+    if ong.email in Ong.retornar_emails_existentes(id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="O e-mail informado já está em uso.")
     ong.atualizar_ong(id)
     return f"A ONG {ong.nome} foi alterada com sucesso!"
 

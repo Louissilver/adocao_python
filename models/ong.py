@@ -7,6 +7,7 @@ from pydantic import validator
 from models.pessoa import Pessoa
 from schemas.ong import ongEntity, ongsEntity
 from config.db import conn
+from schemas.pessoa import pessoaEntity, pessoasEntity
 
 
 class Ong(Pessoa):
@@ -69,6 +70,19 @@ class Ong(Pessoa):
     def retornar_id_pessoa(id):
         return ongEntity(conn.adocao.ong.find_one(
             {"_id": ObjectId(id)}))["id_pessoa"]
+
+    @staticmethod
+    def retornar_emails_existentes(id=None):
+        emails = []
+        if conn.adocao.pessoa.find().count() > 0:
+            pessoas = pessoasEntity(conn.adocao.pessoa.find())
+            for pessoa in pessoas:
+                emails.append(pessoa["email"])
+            if id != None:
+                id_pessoa = Ong.retornar_id_pessoa(id)
+                emails.remove(
+                    Ong.retornar_uma_pessoa(id_pessoa)["email"])
+        return emails
 
     @staticmethod
     def deletar_ong(id):
