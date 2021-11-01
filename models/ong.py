@@ -85,6 +85,18 @@ class Ong(Pessoa):
         return emails
 
     @staticmethod
+    def retornar_cnpjs_existentes(id=None):
+        cnpjs = []
+        if conn.adocao.ong.find().count() > 0:
+            ongs = ongsEntity(conn.adocao.ong.find())
+            for ong in ongs:
+                cnpjs.append(ong["cnpj"])
+            if id != None:
+                cnpjs.remove(
+                    Ong.retornar_uma_ong(id)["cnpj"])
+        return cnpjs
+
+    @staticmethod
     def deletar_ong(id):
         conn.adocao.ong.find_one_and_delete({"_id": ObjectId(id)})
 

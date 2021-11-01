@@ -23,6 +23,12 @@ async def create_associado(associado: Associado, usuario: Usuario):
     if associado.email in Associado.retornar_emails_existentes():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="O e-mail informado já está em uso.")
+    if associado.cpf in Associado.retornar_cpfs_existentes():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="O CPF informado já está em uso.")
+    if usuario.login in Usuario.retornar_logins_existentes():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="O login informado já está em uso.")
     _id_pessoa = associado.inserir_pessoa()
     id_pessoa = str(_id_pessoa.inserted_id)
 
@@ -30,9 +36,6 @@ async def create_associado(associado: Associado, usuario: Usuario):
     id_associado = str(_id_associado.inserted_id)
 
     usuario.tipo_usuario = "Associado"
-    if usuario.login in Usuario.retornar_logins_existentes():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="O login informado já está em uso.")
     _id_usuario = usuario.inserir_usuario()
     id_usuario = str(_id_usuario.inserted_id)
 
@@ -44,9 +47,12 @@ async def create_associado(associado: Associado, usuario: Usuario):
 
 @associado.put('/associados/{id}', status_code=status.HTTP_200_OK)
 async def update_associado(id, associado: Associado):
-    if associado.email in Pessoa.retornar_emails_existentes(id):
+    if associado.email in Associado.retornar_emails_existentes(id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="O e-mail informado já está em uso.")
+    if associado.cpf in Associado.retornar_cpfs_existentes(id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="O CPF informado já está em uso.")
     associado.atualizar_associado(id)
     return f"O associado {associado.nome} foi alterado com sucesso!"
 

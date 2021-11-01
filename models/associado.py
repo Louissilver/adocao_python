@@ -140,6 +140,18 @@ class Associado(Pessoa):
                     Associado.retornar_uma_pessoa(id_pessoa)["email"])
         return emails
 
+    @staticmethod
+    def retornar_cpfs_existentes(id=None):
+        cpfs = []
+        if conn.adocao.associado.find().count() > 0:
+            associados = associadosEntity(conn.adocao.associado.find())
+            for associado in associados:
+                cpfs.append(associado["cpf"])
+            if id != None:
+                cpfs.remove(
+                    Associado.retornar_um_associado(id)["cpf"])
+        return cpfs
+
     class Config:
         schema_extra = {
             "example": {

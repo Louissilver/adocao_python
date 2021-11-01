@@ -23,6 +23,12 @@ async def create_ong(ong: Ong, usuario: Usuario):
     if ong.email in Ong.retornar_emails_existentes():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="O e-mail informado já está em uso.")
+    if ong.cnpj in Ong.retornar_cnpjs_existentes():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="O CNPJ informado já está em uso.")
+    if usuario.login in Usuario.retornar_logins_existentes():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="O login informado já está em uso.")
     _id_pessoa = ong.inserir_pessoa()
     id_pessoa = str(_id_pessoa.inserted_id)
 
@@ -30,9 +36,6 @@ async def create_ong(ong: Ong, usuario: Usuario):
     id_ong = str(_id_ong.inserted_id)
 
     usuario.tipo_usuario = "ONG"
-    if usuario.login in Usuario.retornar_logins_existentes():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="O login informado já está em uso.")
     _id_usuario = usuario.inserir_usuario()
     id_usuario = str(_id_usuario.inserted_id)
 
@@ -47,6 +50,9 @@ async def update_ong(id, ong: Ong):
     if ong.email in Ong.retornar_emails_existentes(id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="O e-mail informado já está em uso.")
+    if ong.cnpj in Ong.retornar_cnpjs_existentes(id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="O CNPJ informado já está em uso.")
     ong.atualizar_ong(id)
     return f"A ONG {ong.nome} foi alterada com sucesso!"
 
