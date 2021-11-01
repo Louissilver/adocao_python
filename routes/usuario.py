@@ -1,8 +1,11 @@
 from fastapi.exceptions import HTTPException
+from fastapi.params import Depends
 from fastapi.routing import APIRouter
+from fastapi.security.oauth2 import OAuth2PasswordBearer
 from models.usuario import Usuario
 from fastapi import status
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 usuario = APIRouter()
 
 
@@ -24,3 +27,10 @@ async def update_usuario(id, usuario: Usuario):
     usuario.senha = Usuario.get_passwordhash(usuario.senha)
     usuario.atualizar_usuario(id)
     return f"O usuário {usuario.login} foi alterado com sucesso!"
+
+
+@usuario.get('/usuario/atual', status_code=status.HTTP_200_OK)
+async def autenticar(token: str = Depends(oauth2_scheme)):
+    usuario_atual = Usuario.retornar_usuario_atual(token)
+    tipo_usuario = Usuario.retornar_tipo_usuario(usuario_atual)
+    return {"token": token, "usuario_atual": usuario_atual, "tipo_usuario": tipo_usuario}

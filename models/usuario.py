@@ -3,7 +3,6 @@ import re
 from typing import Optional
 from bson import ObjectId
 from fastapi import HTTPException, status
-from jose.constants import ALGORITHMS
 from pydantic import BaseModel
 from pydantic import validator
 from config.db import conn
@@ -61,6 +60,23 @@ class Usuario(BaseModel):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O tipo de usuário é inválido. Deve ser 'ONG' ou 'Associado'")
         return valor
+
+    @staticmethod
+    def retornar_usuario_atual(token):
+        load_dotenv()
+        SECRET_KEY = os.getenv('SECRET_KEY')
+        ALGORITHM = os.getenv('ALGORITHM')
+        try:
+            decoded_jwt = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            usuario = decoded_jwt.get('sub')
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Usuário ou senha incorretos.")
+        return usuario
+
+    @staticmethod
+    def retornar_tipo_usuario(usuario_atual):
+        return usuarioEntity(conn.adocao.usuario.find_one({"login": usuario_atual}))["tipo_usuario"]
 
     @staticmethod
     def autenticar_usuario(login, senha):

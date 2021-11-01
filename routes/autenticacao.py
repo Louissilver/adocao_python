@@ -11,7 +11,7 @@ autenticacao = APIRouter()
 
 
 @autenticacao.post("/token")
-def login(form_data: OAuth2PasswordRequestForm = Depends()):
+def gerar_token(form_data: OAuth2PasswordRequestForm = Depends()):
     login = form_data.username
     senha = form_data.password
 
@@ -22,8 +22,3 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Usuário ou senha incorretos.")
-
-
-@autenticacao.get('/autenticacao', status_code=status.HTTP_200_OK)
-async def autenticar(token: str = Depends(oauth2_scheme)):
-    return {"token": token}
