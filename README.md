@@ -54,6 +54,15 @@ Utilize o `pip` para baixar as dependências do projeto:
 pip install -r requirements.txt
 ```
 
+## Variáveis de ambiente
+
+Crie um arquivo na pasta raiz com a extensão ```.env``` e inclua nele duas variáveis:
+
+``` shell
+SECRET_KEY = "AlgumValorAleatorioDeChaveSecreta"
+ALGORITHM = "HS256"
+```
+
 ## Banco de dados
 
 A aplicação utiliza **MongoDB** e criará automaticamente o banco de dados, mas

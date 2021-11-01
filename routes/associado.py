@@ -5,6 +5,7 @@ from models.associado import Associado
 from models.pessoa import Pessoa
 from models.usuario import Usuario
 
+
 associado = APIRouter()
 
 
@@ -36,6 +37,7 @@ async def create_associado(associado: Associado, usuario: Usuario):
     id_associado = str(_id_associado.inserted_id)
 
     usuario.tipo_usuario = "Associado"
+    usuario.senha = Usuario.get_passwordhash(usuario.senha)
     _id_usuario = usuario.inserir_usuario()
     id_usuario = str(_id_usuario.inserted_id)
 

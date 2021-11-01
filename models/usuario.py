@@ -1,11 +1,24 @@
+from datetime import datetime, timedelta
 import re
 from typing import Optional
 from bson import ObjectId
 from fastapi import HTTPException, status
+from jose.constants import ALGORITHMS
 from pydantic import BaseModel
 from pydantic import validator
 from config.db import conn
 from schemas.usuario import usuarioEntity, usuariosEntity
+from passlib.context import CryptContext
+from jose import jwt
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+ALGORITHM = os.getenv('ALGORITHM')
+
+pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 
 class Usuario(BaseModel):
@@ -50,6 +63,34 @@ class Usuario(BaseModel):
         return valor
 
     @staticmethod
+    def autenticar_usuario(login, senha):
+        usuario = Usuario.retornar_login_e_senha(login)
+
+        if usuario:
+            password_check = pwd_context.verify(senha, usuario["senha"])
+            return password_check
+        else:
+            return False
+
+    @staticmethod
+    def criar_token_de_acesso(data: dict, expires_delta: timedelta):
+        to_encode = data.copy()
+        expire = datetime.utcnow() + expires_delta
+        to_encode.update({"exp": expire})
+
+        load_dotenv()
+        SECRET_KEY = os.getenv('SECRET_KEY')
+        ALGORITHM = os.getenv('ALGORITHM')
+
+        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+        return encoded_jwt
+
+    @staticmethod
+    def get_passwordhash(password):
+        return pwd_context.hash(password)
+
+    @staticmethod
     def retornar_usuarios():
         return usuariosEntity(conn.adocao.usuario.find())
 
@@ -65,6 +106,12 @@ class Usuario(BaseModel):
     @staticmethod
     def retornar_um_usuario(id):
         return usuarioEntity(conn.adocao.usuario.find_one({"_id": ObjectId(id)}))
+
+    @staticmethod
+    def retornar_login_e_senha(login):
+        if conn.adocao.usuario.find({"login": login}).count() > 0:
+            return usuarioEntity(conn.adocao.usuario.find_one({"login": login}))
+        return []
 
     def inserir_usuario(self):
         return conn.adocao.usuario.insert_one({

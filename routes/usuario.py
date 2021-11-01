@@ -21,5 +21,6 @@ async def update_usuario(id, usuario: Usuario):
     if usuario.login in Usuario.retornar_logins_existentes(id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="O login informado já está em uso.")
+    usuario.senha = Usuario.get_passwordhash(usuario.senha)
     usuario.atualizar_usuario(id)
     return f"O usuário {usuario.login} foi alterado com sucesso!"
