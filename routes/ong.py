@@ -36,6 +36,7 @@ async def create_ong(ong: Ong, usuario: Usuario):
     id_ong = str(_id_ong.inserted_id)
 
     usuario.tipo_usuario = "ONG"
+    usuario.senha = Usuario.get_passwordhash(usuario.senha)
     _id_usuario = usuario.inserir_usuario()
     id_usuario = str(_id_usuario.inserted_id)
 
