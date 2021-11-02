@@ -35,61 +35,26 @@ class Pet(BaseModel):
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O nome deve conter, pelo menos, 2 caracteres.")
         return valor
 
-    @validator('porte')
-    def validar_porte(cls, valor):
-        valor = valor.strip()
-        if valor == '':
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo porte é obrigatório.")
-        if valor != 'Pequeno' and valor != 'Médio' and valor != 'Grande':
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O porte informado é inválido. Tente 'Pequeno', 'Médio' ou 'Grande'")
-        return valor
-
-    @validator('sexo')
-    def validar_sexo(cls, valor):
-        valor = valor.strip()
-        if valor == '':
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo sexo é obrigatório.")
-        if len(valor) != 1:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O sexo deve conter apenas um caracter, M - Masculino, F - Feminino.")
-        return valor
-
-    @validator('urlFoto')
-    def validar_urlFoto(cls, valor):
-        valor = valor.strip()
-        if valor == '':
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo urlFoto é obrigatório.")
-        padrao = "^[a-zA-Z0-9-_]+[:./\\\]+([a-zA-Z0-9 -_./:=&\"'?%+@#$!])+$"
-        validacao = re.match(padrao, valor)
-        if not validacao:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="A URL informada não é válida. Tente um exemplo como https://www.google.com.br/search?q=%2520%25+space&oq=%2520%25+space&aqs=chrome..69i57j0l5.9863j0j7&sourceid=chrome&ie=UTF-8")
-        return valor
-
     @validator('especie')
     def validar_especie(cls, valor):
         valor = valor.strip()
         if valor == '':
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo especie é obrigatório.")
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo espécie é obrigatório.")
         if len(valor) < 3:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="A especie deve conter, pelo menos, 3 caracteres.")
+                status_code=status.HTTP_400_BAD_REQUEST, detail="A espécie deve conter, pelo menos, 3 caracteres.")
         return valor
-
+        
     @validator('raca')
     def validar_raca(cls, valor):
         valor = valor.strip()
         if valor == '':
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo raca é obrigatório.")
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo raça é obrigatório.")
         if len(valor) < 3:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O raca deve conter, pelo menos, 3 caracteres.")
+                status_code=status.HTTP_400_BAD_REQUEST, detail="A raça deve conter, pelo menos, 3 caracteres.")
         return valor
 
     @validator('dataNascimento')
@@ -103,7 +68,7 @@ class Pet(BaseModel):
             mes = int(data[1].replace("0", ""))
         if valor == '':
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo dataNascimento é obrigatório.")
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo data de nascimento é obrigatório.")
         padrao = "^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$"
         validacao = re.match(padrao, valor)
         if not validacao:
@@ -112,6 +77,41 @@ class Pet(BaseModel):
         if datetime(ano, mes, dia) > datetime.now():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="A data informada deve ser menor do que a data atual.")
+        return valor
+
+    @validator('sexo')
+    def validar_sexo(cls, valor):
+        valor = valor.strip()
+        if valor == '':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo sexo é obrigatório.")
+        if len(valor) != 1:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O sexo deve conter apenas um caracter, M - Masculino, F - Feminino.")
+        return valor
+
+    @validator('porte')
+    def validar_porte(cls, valor):
+        valor = valor.strip()
+        if valor == '':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo porte é obrigatório.")
+        if valor != 'Pequeno' and valor != 'Médio' and valor != 'Grande':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O porte informado é inválido. Tente 'Pequeno', 'Médio' ou 'Grande'")
+        return valor
+
+    @validator('urlFoto')
+    def validar_urlFoto(cls, valor):
+        valor = valor.strip()
+        if valor == '':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo url de imagem é obrigatório.")
+        padrao = "^[a-zA-Z0-9-_]+[:./\\\]+([a-zA-Z0-9 -_./:=&\"'?%+@#$!])+$"
+        validacao = re.match(padrao, valor)
+        if not validacao:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="A URL informada não é válida. Tente um exemplo como 'https://www.google.com.br/'")
         return valor
 
     @staticmethod
