@@ -46,7 +46,7 @@ class Associado(Pessoa):
         validacao = re.match(padrao, valor)
         if not validacao:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="A data informada não é válida.")
+                status_code=status.HTTP_400_BAD_REQUEST, detail="A data informada não é válida. Tente o formato 'dd/mm/yyyy'")
         if datetime(ano, mes, dia) > datetime.now():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="A data informada deve ser menor do que a data atual.")

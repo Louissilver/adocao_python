@@ -44,11 +44,14 @@ class Pessoa(BaseModel):
     @validator('telefone', pre=True)
     def validar_telefone(cls, valor):
         valor = valor.strip()
+        if valor == '':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo telefone é obrigatório.")
         padrao = "^\(?\d{2}\)?[\s-]?[\s9]?\d{4}-?\d{4}$"
         validacao = re.match(padrao, valor)
         if not validacao:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O telefone informado não é válido. Tente o formato (XX)XXXXX-XXXX")
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O telefone informado não é válido. Tente o formato '(XX)XXXXX-XXXX'")
         return valor
 
     def inserir_pessoa(self):

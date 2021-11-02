@@ -34,7 +34,7 @@ class Usuario(BaseModel):
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O campo login é obrigatório.")
         if len(valor) < 5:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O login deve conter, pelo menos, 5 caracteres")
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O login deve conter, pelo menos, 5 caracteres.")
         return valor
 
     @validator('senha')
@@ -42,7 +42,7 @@ class Usuario(BaseModel):
         valor = valor.strip()
         if valor == '':
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo login é obrigatório.")
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo senha é obrigatório.")
         padrao = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
         validacao = re.match(padrao, valor)
         if not validacao:

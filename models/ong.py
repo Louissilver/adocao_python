@@ -24,7 +24,7 @@ class Ong(Pessoa):
         validacao = re.match(padrao, valor)
         if not validacao:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O CNPJ informado não é válido. Tente o formato XX.XXX.XXX/XXXX-XX")
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O CNPJ informado não é válido. Tente o formato 'XX.XXX.XXX/XXXX-XX'")
         return valor
 
     @staticmethod
