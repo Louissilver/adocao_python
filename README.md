@@ -32,7 +32,7 @@ Se você ainda não possui o virtual environment do Python, instale com o comand
 Crie um ambiente virtual no diretório
 
   ``` shell
-  python -m venv './adocao_python/'
+  python -m venv './venv/'
   ```
 
 * Em _Linux_, _macOS_ e outros _UNIXes_, ative o virtual environment:
