@@ -45,7 +45,7 @@ class Pet(BaseModel):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="A espécie deve conter, pelo menos, 3 caracteres.")
         return valor
-        
+
     @validator('raca')
     def validar_raca(cls, valor):
         valor = valor.strip()
@@ -145,7 +145,8 @@ class Pet(BaseModel):
             "adotado": False,
             "urlFoto": self.urlFoto,
             "observacoes": self.observacoes,
-            "id_ong": self.id_ong
+            "id_ong": self.id_ong,
+            "id_associado": self.id_associado,
         })
 
     def atualizar_um_pet(self, id):
@@ -166,7 +167,8 @@ class Pet(BaseModel):
                 "adotado": False,
                 "urlFoto": self.urlFoto,
                 "observacoes": self.observacoes,
-                "id_ong": self.id_ong
+                "id_ong": self.id_ong,
+                "id_associado": self.id_associado,
             }})
 
     @staticmethod
