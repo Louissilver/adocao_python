@@ -10,6 +10,7 @@ def petEntity(item) -> dict:
         "adotado": item["adotado"],
         "urlFoto": item["urlFoto"],
         "observacoes": item["observacoes"],
+        "id_ong": item["id_ong"],
     }
 
 
