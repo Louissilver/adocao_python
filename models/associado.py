@@ -57,6 +57,11 @@ class Associado(Pessoa):
         return associadosEntity(conn.adocao.associado.find())
 
     @staticmethod
+    def retornar_id_associado_por_pessoa(id_pessoa):
+        return associadoEntity(conn.adocao.associado.find_one(
+            {"id_pessoa": id_pessoa}))["id"]
+
+    @staticmethod
     def retornar_um_associado(id):
         ids = []
         for i in Associado.retornar_associados():

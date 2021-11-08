@@ -72,6 +72,11 @@ class Ong(Pessoa):
             {"_id": ObjectId(id)}))["id_pessoa"]
 
     @staticmethod
+    def retornar_id_ong_por_pessoa(id_pessoa):
+        return ongEntity(conn.adocao.ong.find_one(
+            {"id_pessoa": id_pessoa}))["id"]
+
+    @staticmethod
     def retornar_emails_existentes(id=None):
         emails = []
         if conn.adocao.pessoa.find().count() > 0:
