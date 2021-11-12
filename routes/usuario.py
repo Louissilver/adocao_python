@@ -20,6 +20,11 @@ async def find_one_usuario(id):
     return Usuario.retornar_um_usuario(id)
 
 
+@usuario.get('/usuarios/existe/{login}', status_code=status.HTTP_200_OK)
+async def find_usuario_por_login(login):
+    return Usuario.retornar_usuario_por_login(login)
+
+
 @usuario.put('/usuarios/{id}', status_code=status.HTTP_200_OK)
 async def update_usuario(id, usuario: Usuario):
     if usuario.login in Usuario.retornar_logins_existentes(id):

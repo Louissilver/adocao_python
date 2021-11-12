@@ -128,6 +128,16 @@ class Usuario(BaseModel):
         return usuarioEntity(conn.adocao.usuario.find_one({"_id": ObjectId(id)}))
 
     @staticmethod
+    def retornar_usuario_por_login(login):
+        consulta = conn.adocao.usuario.find_one({"login": login})
+        print(consulta['login'])
+        if consulta == None:
+            return
+        else:
+            return usuarioEntity(conn.adocao.usuario.find_one(
+                {"login": login}))["login"]
+
+    @staticmethod
     def retornar_login_e_senha(login):
         if conn.adocao.usuario.find({"login": login}).count() > 0:
             return usuarioEntity(conn.adocao.usuario.find_one({"login": login}))
