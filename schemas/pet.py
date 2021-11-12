@@ -11,6 +11,7 @@ def petEntity(item) -> dict:
         "urlFoto": item["urlFoto"],
         "observacoes": item["observacoes"],
         "id_ong": item["id_ong"],
+        "id_associado": item["id_associado"],
     }
 
 
