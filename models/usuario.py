@@ -80,7 +80,9 @@ class Usuario(BaseModel):
             {"login": usuario_atual}))["tipo_usuario"]
         id_pessoa = usuarioEntity(conn.adocao.usuario.find_one(
             {"login": usuario_atual}))["id_pessoa"]
-        return [tipo_usuario, id_pessoa]
+        id_usuario = str(usuarioEntity(conn.adocao.usuario.find_one(
+            {"login": usuario_atual}))["id"])
+        return [tipo_usuario, id_pessoa, id_usuario]
 
     @staticmethod
     def autenticar_usuario(login, senha):
