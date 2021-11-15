@@ -30,7 +30,7 @@ class Pet(BaseModel):
         if valor == '':
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O campo nome é obrigatório.")
-        if len(valor) <= 1:
+        if len(valor) < 2:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O nome deve conter, pelo menos, 2 caracteres.")
         return valor
@@ -76,7 +76,7 @@ class Pet(BaseModel):
                 status_code=status.HTTP_400_BAD_REQUEST, detail="A data informada não é válida. Tente o formado 'dd/mm/aaaa'")
         if datetime(ano, mes, dia) > datetime.now():
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="A data informada deve ser menor do que a data atual.")
+                status_code=status.HTTP_400_BAD_REQUEST, detail="A data informada não pode ser maior que a atual.")
         return valor
 
     @validator('sexo')

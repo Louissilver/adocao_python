@@ -22,7 +22,7 @@ class Pessoa(BaseModel):
         if valor == '':
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O campo nome é obrigatório.")
-        if len(valor) <= 3:
+        if len(valor) < 3:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O nome deve conter, pelo menos, 3 caracteres.")
         return valor

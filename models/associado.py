@@ -49,7 +49,7 @@ class Associado(Pessoa):
                 status_code=status.HTTP_400_BAD_REQUEST, detail="A data informada não é válida. Tente o formato 'dd/mm/yyyy'")
         if datetime(ano, mes, dia) > datetime.now():
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="A data informada deve ser menor do que a data atual.")
+                status_code=status.HTTP_400_BAD_REQUEST, detail="A idade para cadastro deve ser maior que 18 anos.")
         return valor
 
     @staticmethod
