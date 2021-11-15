@@ -163,7 +163,6 @@ class Usuario(BaseModel):
             "$set": {
                 "login": self.login,
                 "senha": self.senha,
-                "tipo_usuario": self.tipo_usuario,
             }
         })
 
