@@ -7,6 +7,7 @@ from pydantic import validator
 from config.db import conn
 from models.associado import Associado
 from models.pet import Pet
+from email_validator import EmailNotValidError, validate_email
 from schemas.solicitacao_adocao import solicitacao_adocaoEntity, solicitacoes_adocaoEntity
 import re
 
@@ -18,8 +19,12 @@ class Solicitacao_Adocao(BaseModel):
     nome_pet: str
     nome_ong: str
     cnpj_ong: str
+    telefone_ong: str
+    email_ong: str
     nome_associado: str
     cpf_associado: str
+    telefone_associado: str
+    email_associado: str
     aprovado: Optional[bool]
     finalizado: Optional[bool]
     referencias: str
@@ -119,6 +124,60 @@ class Solicitacao_Adocao(BaseModel):
                 status_code=status.HTTP_400_BAD_REQUEST, detail="As referências informadas devem conter, pelo menos, 30 caracteres e espaços, formando um texto.")
         return valor
 
+    @validator('email_ong', pre=True)
+    def validar_email_ong(cls, valor):
+        valor = valor.strip()
+        if valor == '':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo e-mail é obrigatório.")
+        try:
+            valid = validate_email(valor)
+            valor = valid.email
+        except EmailNotValidError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O e-mail informado não é válido. Tente o formato 'email@example.com'")
+        return valor
+
+    @validator('telefone_ong', pre=True)
+    def validar_telefone_ong(cls, valor):
+        valor = valor.strip()
+        if valor == '':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo telefone é obrigatório.")
+        padrao = "^\(?\d{2}\)?[\s-]?[\s9]?\d{4}-?\d{4}$"
+        validacao = re.match(padrao, valor)
+        if not validacao:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O telefone informado não é válido. Tente o formato '(XX)XXXXX-XXXX'")
+        return valor
+
+    @validator('email_associado', pre=True)
+    def validar_email_associado(cls, valor):
+        valor = valor.strip()
+        if valor == '':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo e-mail é obrigatório.")
+        try:
+            valid = validate_email(valor)
+            valor = valid.email
+        except EmailNotValidError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O e-mail informado não é válido. Tente o formato 'email@example.com'")
+        return valor
+
+    @validator('telefone_associado', pre=True)
+    def validar_telefone_associado(cls, valor):
+        valor = valor.strip()
+        if valor == '':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo telefone é obrigatório.")
+        padrao = "^\(?\d{2}\)?[\s-]?[\s9]?\d{4}-?\d{4}$"
+        validacao = re.match(padrao, valor)
+        if not validacao:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O telefone informado não é válido. Tente o formato '(XX)XXXXX-XXXX'")
+        return valor
+
     @staticmethod
     def retornar_solicitacoes():
         return solicitacoes_adocaoEntity(conn.adocao.solicitacao_adocao.find())
@@ -135,8 +194,12 @@ class Solicitacao_Adocao(BaseModel):
             "nome_pet": self.nome_pet,
             "nome_ong": self.nome_ong,
             "cnpj_ong": self.cnpj_ong,
+            "telefone_ong": self.telefone_ong,
+            "email_ong": self.email_ong,
             "nome_associado": self.nome_associado,
             "cpf_associado": self.cpf_associado,
+            "telefone_associado": self.telefone_associado,
+            "email_associado": self.email_associado,
             "aprovado": False,
             "finalizado": False,
             "referencias": self.referencias,
@@ -152,8 +215,12 @@ class Solicitacao_Adocao(BaseModel):
                 "nome_pet": self.nome_pet,
                 "nome_ong": self.nome_ong,
                 "cnpj_ong": self.cnpj_ong,
+                "telefone_ong": self.telefone_ong,
+                "email_ong": self.email_ong,
                 "nome_associado": self.nome_associado,
                 "cpf_associado": self.cpf_associado,
+                "telefone_associado": self.telefone_associado,
+                "email_associado": self.email_associado,
                 "referencias": self.referencias,
             }
         })
@@ -205,8 +272,12 @@ class Solicitacao_Adocao(BaseModel):
                 "nome_pet": "Rubídio",
                 "nome_ong": "Anjos de Rua",
                 "cnpj_ong": "65.705.048/0001-40",
+                "telefone_ong": "(51)3344-5515",
+                "email_ong": "anjr@example.com",
                 "nome_associado": "Luís Fernando da Silveira",
                 "cpf_associado": "453.964.972-89",
+                "telefone_associado": "(51)99344-5515",
+                "email_associado": "luisfsilveira@example.com",
                 "referencias": "Tenho um filho que ama animais, um pátio enorme e atualmente já cuido ...",
             }
         }
