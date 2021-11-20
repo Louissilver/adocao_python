@@ -30,64 +30,7 @@ class Solicitacao_Adocao(BaseModel):
     referencias: str
     dataSolicitacao: Optional[datetime]
 
-    @validator('nome_pet')
-    def validar_nome(cls, valor):
-        valor = valor.strip()
-        if valor == '':
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo nome é obrigatório.")
-        if len(valor) <= 1:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O nome deve conter, pelo menos, 2 caracteres.")
-        return valor
-
-    @validator('nome_ong')
-    def validar_nome_ong(cls, valor):
-        valor = valor.strip()
-        if valor == '':
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo nome é obrigatório.")
-        if len(valor) < 3:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O nome deve conter, pelo menos, 3 caracteres.")
-        return valor
-
-    @validator('nome_associado')
-    def validar_nome_associado(cls, valor):
-        valor = valor.strip()
-        if valor == '':
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo nome é obrigatório.")
-        if len(valor) < 3:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O nome deve conter, pelo menos, 3 caracteres.")
-        return valor
-
-    @validator('cpf_associado')
-    def validar_cpf(cls, valor):
-        valor = valor.strip()
-        if valor == '':
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo CPF é obrigatório.")
-        padrao = "^\d{3}\.\d{3}\.\d{3}\-\d{2}$"
-        validacao = re.match(padrao, valor)
-        if not validacao:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O CPF informado não é válido. Tente o formato 'XXX.XXX.XXX-XX'")
-        return valor
-
-    @validator('cnpj_ong')
-    def validar_cnpj(cls, valor):
-        valor = valor.strip()
-        if valor == '':
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo CNPJ é obrigatório.")
-        padrao = "^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$"
-        validacao = re.match(padrao, valor)
-        if not validacao:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O CNPJ informado não é válido. Tente o formato 'XX.XXX.XXX/XXXX-XX'")
-        return valor
+# Validadores
 
     @validator('id_associado')
     def validar_id_associado(cls, valor):
@@ -113,15 +56,39 @@ class Solicitacao_Adocao(BaseModel):
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O campo id_pet é obrigatório.")
         return valor
 
-    @validator('referencias')
-    def validar_referencias(cls, valor):
+    @validator('nome_pet')
+    def validar_nome(cls, valor):
         valor = valor.strip()
         if valor == '':
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo referencias é obrigatório.")
-        if len(valor) < 30 or (' ' not in valor):
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo nome é obrigatório.")
+        if len(valor) <= 1:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="As referências informadas devem conter, pelo menos, 30 caracteres e espaços, formando um texto.")
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O nome deve conter, pelo menos, 2 caracteres.")
+        return valor
+
+    @validator('nome_ong')
+    def validar_nome_ong(cls, valor):
+        valor = valor.strip()
+        if valor == '':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo nome é obrigatório.")
+        if len(valor) < 3:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O nome deve conter, pelo menos, 3 caracteres.")
+        return valor
+
+    @validator('cnpj_ong')
+    def validar_cnpj(cls, valor):
+        valor = valor.strip()
+        padrao = "^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$"
+        validacao = re.match(padrao, valor)
+        if valor == '':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo CNPJ é obrigatório.")
+        if not validacao:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O CNPJ informado não é válido. Tente o formato 'XX.XXX.XXX/XXXX-XX'")
         return valor
 
     @validator('email_ong', pre=True)
@@ -141,14 +108,38 @@ class Solicitacao_Adocao(BaseModel):
     @validator('telefone_ong', pre=True)
     def validar_telefone_ong(cls, valor):
         valor = valor.strip()
+        padrao = "^\(?\d{2}\)?[\s-]?[\s9]?\d{4}-?\d{4}$"
+        validacao = re.match(padrao, valor)
         if valor == '':
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O campo telefone é obrigatório.")
-        padrao = "^\(?\d{2}\)?[\s-]?[\s9]?\d{4}-?\d{4}$"
-        validacao = re.match(padrao, valor)
         if not validacao:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O telefone informado não é válido. Tente o formato '(XX)XXXXX-XXXX'")
+        return valor
+
+    @validator('nome_associado')
+    def validar_nome_associado(cls, valor):
+        valor = valor.strip()
+        if valor == '':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo nome é obrigatório.")
+        if len(valor) < 3:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O nome deve conter, pelo menos, 3 caracteres.")
+        return valor
+
+    @validator('cpf_associado')
+    def validar_cpf(cls, valor):
+        valor = valor.strip()
+        padrao = "^\d{3}\.\d{3}\.\d{3}\-\d{2}$"
+        validacao = re.match(padrao, valor)
+        if valor == '':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo CPF é obrigatório.")
+        if not validacao:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O CPF informado não é válido. Tente o formato 'XXX.XXX.XXX-XX'")
         return valor
 
     @validator('email_associado', pre=True)
@@ -168,24 +159,32 @@ class Solicitacao_Adocao(BaseModel):
     @validator('telefone_associado', pre=True)
     def validar_telefone_associado(cls, valor):
         valor = valor.strip()
+        padrao = "^\(?\d{2}\)?[\s-]?[\s9]?\d{4}-?\d{4}$"
+        validacao = re.match(padrao, valor)
         if valor == '':
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O campo telefone é obrigatório.")
-        padrao = "^\(?\d{2}\)?[\s-]?[\s9]?\d{4}-?\d{4}$"
-        validacao = re.match(padrao, valor)
         if not validacao:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O telefone informado não é válido. Tente o formato '(XX)XXXXX-XXXX'")
         return valor
 
-    @staticmethod
-    def retornar_solicitacoes():
-        return solicitacoes_adocaoEntity(conn.adocao.solicitacao_adocao.find())
+    @validator('referencias')
+    def validar_referencias(cls, valor):
+        valor = valor.strip()
+        if valor == '':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="O campo referencias é obrigatório.")
+        if len(valor) < 30 or (' ' not in valor):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="As referências informadas devem conter, pelo menos, 30 caracteres e espaços, formando um texto.")
+        return valor
 
-    @staticmethod
-    def retornar_uma_solicitacao(id):
-        return solicitacao_adocaoEntity(conn.adocao.solicitacao_adocao.find_one({"_id": ObjectId(id)}))
+# Métodos de instância
 
+    # Objetivo: Inserir no banco um registro de solicitação utilizando os atributos da classe
+    # Parâmetros:
+    # Retorno: Objeto MongoClient
     def inserir_solicitacao(self):
         return conn.adocao.solicitacao_adocao.insert_one({
             "id_associado": self.id_associado,
@@ -206,6 +205,9 @@ class Solicitacao_Adocao(BaseModel):
             "dataSolicitacao": datetime.now(),
         })
 
+    # Objetivo: Encontrar uma solicitação através do id e atualizar os campos com os atributos da classe
+    # Parâmetros: id: str
+    # Retorno:
     def atualizar_solicitacao(self, id):
         conn.adocao.solicitacao_adocao.find_one_and_update({"_id": ObjectId(id)}, {
             "$set": {
@@ -225,7 +227,26 @@ class Solicitacao_Adocao(BaseModel):
             }
         })
 
+# Métodos estáticos
+
     @staticmethod
+    # Objetivo: Retornar uma lista com todas as solicitações de adoção cadastradas
+    # Parâmetros:
+    # Retorno: Lista de dicionários contendo todas as solicitações de adoção cadastradas
+    def retornar_solicitacoes():
+        return solicitacoes_adocaoEntity(conn.adocao.solicitacao_adocao.find())
+
+    @staticmethod
+    # Objetivo: Encontrar a solicitação que possua o id passado por parâmetro e retornar um dicionário com keys/values da solicitação cadastrada
+    # Parâmetros: id: str
+    # Retorno: Dicionário contendo keys/values da solicitação cadastrada
+    def retornar_uma_solicitacao(id):
+        return solicitacao_adocaoEntity(conn.adocao.solicitacao_adocao.find_one({"_id": ObjectId(id)}))
+
+    @staticmethod
+    # Objetivo: Encontrar a solicitação que possua o id passado por parâmetro e atualizar o campo aprovado para True
+    # Parâmetros: id: str
+    # Retorno: str com id_solicitacao
     def aprovar_solicitacao(id):
         solicitacao = Solicitacao_Adocao.retornar_uma_solicitacao(id)
         if solicitacao["aprovado"]:
@@ -239,6 +260,9 @@ class Solicitacao_Adocao(BaseModel):
         return Solicitacao_Adocao.retornar_id_solicitacao(id)
 
     @staticmethod
+    # Objetivo: Encontrar a solicitação que possua o id passado por parâmetro e atualizar o campo finalizado para True
+    # Parâmetros: id: str
+    # Retorno: str com id_solicitacao
     def finalizar_solicitacao(id):
         solicitacao = Solicitacao_Adocao.retornar_uma_solicitacao(id)
         if solicitacao["finalizado"] == True:
@@ -255,13 +279,21 @@ class Solicitacao_Adocao(BaseModel):
         return Solicitacao_Adocao.retornar_id_solicitacao(id)
 
     @staticmethod
+    # Objetivo: Encontrar a solicitação que possua o id passado por parâmetro e retornar o id_solicitacao
+    # Parâmetros: id: str
+    # Retorno: Dicionário contendo apenas key/value para id da solicitação cadastrada
     def retornar_id_solicitacao(id):
         return solicitacao_adocaoEntity(conn.adocao.solicitacao_adocao.find_one({"_id": ObjectId(id)}))["id"]
 
     @staticmethod
+    # Objetivo: Encontrar um associado através do id e deletar o cadastro
+    # Parâmetros: id: str
+    # Retorno:
     def deletar_solicitacao(id):
         conn.adocao.solicitacao_adocao.find_one_and_delete(
             {"_id": ObjectId(id)})
+
+# Exemplo de esquema
 
     class Config:
         schema_extra = {

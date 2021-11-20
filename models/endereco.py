@@ -12,14 +12,15 @@ class Endereco(BaseModel):
     cidade: str
     estado: str
 
+# Validadores
     @validator('cep')
     def validar_cep(cls, valor):
         valor = valor.strip()
+        padrao = "^\d{5}-\d{3}$"
+        validacao = re.match(padrao, valor)
         if valor == '':
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O campo CEP é obrigatório.")
-        padrao = "^\d{5}-\d{3}$"
-        validacao = re.match(padrao, valor)
         if not validacao:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O CEP informado não é válido. Tente o formato 'XXXXX-XXX'")
@@ -52,9 +53,6 @@ class Endereco(BaseModel):
         if valor == '':
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O campo bairro é obrigatório.")
-        if len(valor) < 1:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="O bairro deve conter, pelo menos, 1 caracter.")
         return valor
 
     @validator('cidade')

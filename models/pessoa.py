@@ -16,6 +16,7 @@ class Pessoa(BaseModel):
     telefone: str
     endereco: Endereco
 
+# Validadores
     @validator('nome')
     def validar_nome(cls, valor):
         valor = valor.strip()
@@ -44,16 +45,21 @@ class Pessoa(BaseModel):
     @validator('telefone', pre=True)
     def validar_telefone(cls, valor):
         valor = valor.strip()
+        padrao = "^\(?\d{2}\)?[\s-]?[\s9]?\d{4}-?\d{4}$"
+        validacao = re.match(padrao, valor)
         if valor == '':
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O campo telefone é obrigatório.")
-        padrao = "^\(?\d{2}\)?[\s-]?[\s9]?\d{4}-?\d{4}$"
-        validacao = re.match(padrao, valor)
         if not validacao:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O telefone informado não é válido. Tente o formato '(XX)XXXXX-XXXX'")
         return valor
 
+# Métodos de instância
+
+    # Objetivo: Inserir no banco um registro de pessoa utilizando os atributos da classe
+    # Parâmetros:
+    # Retorno: Objeto MongoClient
     def inserir_pessoa(self):
         return conn.adocao.pessoa.insert_one({
             "nome": self.nome,
@@ -62,11 +68,19 @@ class Pessoa(BaseModel):
             "endereco": jsonable_encoder(self.endereco)
         })
 
+# Métodos estáticos
+
     @staticmethod
+    # Objetivo: Encontrar a pessoa que possua o id passado por parâmetro e retornar um dicionário com keys/values da pessoa encontrada
+    # Parâmetros: id: str
+    # Retorno: Dicionário contendo keys/values da pessoa cadastrada
     def retornar_uma_pessoa(id):
         return pessoaEntity(conn.adocao.pessoa.find_one({"_id": ObjectId(id)}))
 
     @staticmethod
+    # Objetivo: Retornar uma lista contendo todos os e-mails cadastrados
+    # Parâmetros: id: str
+    # Retorno: Lista de str contendo e-mails
     def retornar_emails_existentes(id=None):
         emails = []
         if conn.adocao.pessoa.find().count() > 0:
@@ -79,9 +93,13 @@ class Pessoa(BaseModel):
         return emails
 
     @staticmethod
+    # Objetivo: Encontrar uma pessoa através do id e deletar o cadastro
+    # Parâmetros: id_pessoa: str
+    # Retorno:
     def deletar_pessoa(id_pessoa):
         conn.adocao.pessoa.find_one_and_delete({"_id": ObjectId(id_pessoa)})
 
+# Exemplo de esquema
     class Config:
         schema_extra = {
             "example": {

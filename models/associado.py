@@ -8,7 +8,8 @@ from fastapi.encoders import jsonable_encoder
 from schemas.associado import associadoEntity, associadosEntity
 from config.db import conn
 from models.pessoa import Pessoa
-from schemas.pessoa import pessoaEntity, pessoasEntity
+from schemas.pessoa import pessoasEntity
+from helpers.dataHelper import retornar_data
 
 
 class Associado(Pessoa):
@@ -17,13 +18,14 @@ class Associado(Pessoa):
     animaisAdotados: Optional[List[str]]
     id_pessoa: Optional[str]
 
+# Validadores
     @validator('cpf')
     def validar_cpf(cls, valor):
         valor = valor.strip()
+        padrao = "^\d{3}\.\d{3}\.\d{3}\-\d{2}$"
         if valor == '':
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O campo CPF é obrigatório.")
-        padrao = "^\d{3}\.\d{3}\.\d{3}\-\d{2}$"
         validacao = re.match(padrao, valor)
         if not validacao:
             raise HTTPException(
@@ -33,74 +35,27 @@ class Associado(Pessoa):
     @validator('dataNascimento')
     def validar_dataNascimento(cls, valor):
         valor = valor.strip()
-        data = valor.split('/')
-        dia, ano = int(data[0]), int(data[2])
-        if(data[1][0] != 0):
-            mes = int(data[1])
-        else:
-            mes = int(data[1].replace("0", ""))
+        padrao = "^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$"
+        dia, mes, ano = retornar_data(valor)
+        validacao = re.match(padrao, valor)
         if valor == '':
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="O campo dataNascimento é obrigatório.")
-        padrao = "^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$"
-        validacao = re.match(padrao, valor)
         if not validacao:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="A data informada não é válida. Tente o formato 'dd/mm/yyyy'")
-        if datetime(ano, mes, dia) > datetime.now():
+        if datetime(ano + 18, mes, dia) >= datetime.now():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="A idade para cadastro deve ser maior que 18 anos.")
         return valor
 
-    @staticmethod
-    def retornar_associados():
-        return associadosEntity(conn.adocao.associado.find())
+# Métodos de instância
 
-    @staticmethod
-    def retornar_id_associado_por_pessoa(id_pessoa):
-        return associadoEntity(conn.adocao.associado.find_one(
-            {"id_pessoa": id_pessoa}))["id"]
-
-    @staticmethod
-    def retornar_um_associado(id):
-        ids = []
-        for i in Associado.retornar_associados():
-            ids.append(i["id"])
-        if id not in ids:
-            raise HTTPException(
-                status_code=404, detail="Não foi possível encontrar nenhum associado com esse id.")
-        return associadoEntity(conn.adocao.associado.find_one({"_id": ObjectId(id)}))
-
-    def inserir_associado(self):
-        data = self.dataNascimento.split('/')
-        dia, ano = int(data[0]), int(data[2])
-        if(data[1][0] != 0):
-            mes = int(data[1])
-        else:
-            mes = int(data[1].replace("0", ""))
-        return conn.adocao.associado.insert_one({
-            "nome": self.nome,
-            "email": self.email,
-            "telefone": self.telefone,
-            "endereco": jsonable_encoder(self.endereco),
-            "cpf": self.cpf,
-            "dataNascimento": datetime(ano, mes, dia),
-            "animaisAdotados": self.animaisAdotados,
-        })
-
-    def inserir_id_pessoa(self, id_associado, id_pessoa):
-        return conn.adocao.associado.find_one_and_update({"_id": ObjectId(id_associado)}, {
-            "$set": {
-                "id_pessoa": id_pessoa
-            }})
-
+    # Objetivo: Encontrar um associado através do id e atualizar os campos com os atributos da classe
+    # Parâmetros: id: str
+    # Retorno:
     def atualizar_associado(self, id):
-        data = self.dataNascimento.split('/')
-        dia, ano = int(data[0]), int(data[2])
-        if(data[1][0] != 0):
-            mes = int(data[1])
-        else:
-            mes = int(data[1].replace("0", ""))
+        dia, mes, ano = retornar_data(self.dataNascimento)
         conn.adocao.associado.find_one_and_update({"_id": ObjectId(id)}, {
             "$set": {
                 "nome": self.nome,
@@ -113,26 +68,94 @@ class Associado(Pessoa):
             }
         })
 
+    # Objetivo: Inserir no banco um registro de associado utilizando os atributos da classe
+    # Parâmetros:
+    # Retorno: Objeto MongoClient
+    def inserir_associado(self):
+        dia, mes, ano = retornar_data(self.dataNascimento)
+        return conn.adocao.associado.insert_one({
+            "nome": self.nome,
+            "email": self.email,
+            "telefone": self.telefone,
+            "endereco": jsonable_encoder(self.endereco),
+            "cpf": self.cpf,
+            "dataNascimento": datetime(ano, mes, dia),
+            "animaisAdotados": self.animaisAdotados,
+        })
+
+    # Objetivo: Encontrar um associado através do id_associado e incluir o id_pessoa
+    # Parâmetros: id_associado: str, id_pessoa: str
+    # Retorno: Objeto MongoClient
+    def inserir_id_pessoa(self, id_associado, id_pessoa):
+        return conn.adocao.associado.find_one_and_update({"_id": ObjectId(id_associado)}, {
+            "$set": {
+                "id_pessoa": id_pessoa
+            }})
+
+# Métodos Estáticos
     @staticmethod
-    def retornar_nome_associado(id):
-        return associadoEntity(conn.adocao.associado.find_one({"_id": ObjectId(id)}))["nome"]
+    # Objetivo: Retornar uma lista com todos os associados cadastrados
+    # Parâmetros:
+    # Retorno: Lista de dicionários contendo os associados cadastrados
+    def retornar_associados():
+        return associadosEntity(conn.adocao.associado.find())
 
     @staticmethod
-    def incluir_pet(solicitacao):
-        conn.adocao.associado.find_one_and_update({"_id": ObjectId(solicitacao["id_associado"])}, {
-            "$push": {"animaisAdotados": solicitacao["id_pet"]}})
+    # Objetivo: Encontrar o associado que possua o id passado por parâmetro e retornar um dicionário com keys/values do associado encontrado
+    # Parâmetros: id: str
+    # Retorno: Dicionário contendo keys/values do associado cadastrado
+    def retornar_um_associado(id):
+        ids = []
+        for i in Associado.retornar_associados():
+            ids.append(i["id"])
+        if id not in ids:
+            raise HTTPException(
+                status_code=404, detail="Não foi possível encontrar nenhum associado com esse id.")
+        return associadoEntity(conn.adocao.associado.find_one({"_id": ObjectId(id)}))
 
     @staticmethod
+    # Objetivo: Encontrar um associado através do id e deletar o cadastro
+    # Parâmetros: id: str
+    # Retorno:
     def deletar_associado(id):
         conn.adocao.associado.find_one_and_delete(
             {"_id": ObjectId(id)})
 
     @staticmethod
+    # Objetivo: Encontrar um associado pelo id e retornar um dicionário contendo key/value de nome do associado
+    # Parâmetros: id: str
+    # Retorno: Dicionário contendo key/value do nome do associado
+    def retornar_nome_associado(id):
+        return associadoEntity(conn.adocao.associado.find_one({"_id": ObjectId(id)}))["nome"]
+
+    @staticmethod
+    # Objetivo: Encontrar o associado que possua o id_pessoa passado por parâmetro e retornar o id de associado
+    # Parâmetros: id_pessoa: str
+    # Retorno: Dicionário contendo apenas key/value para id do associado cadastrado
+    def retornar_id_associado_por_pessoa(id_pessoa):
+        return associadoEntity(conn.adocao.associado.find_one(
+            {"id_pessoa": id_pessoa}))["id"]
+
+    @staticmethod
+    # Objetivo: Encontrar o associado por id_associado e incluir o id_pet no array de animaisAdotados
+    # Parâmetros: solicitacao: Solicitacao
+    # Retorno:
+    def incluir_pet(solicitacao):
+        conn.adocao.associado.find_one_and_update({"_id": ObjectId(solicitacao["id_associado"])}, {
+            "$push": {"animaisAdotados": solicitacao["id_pet"]}})
+
+    @staticmethod
+    # Objetivo: Encontrar um associado através do id e retornar o id_pessoa
+    # Parâmetros: id: str
+    # Retorno: Dicionário com key/value do id_pessoa
     def retornar_id_pessoa(id):
         return associadoEntity(conn.adocao.associado.find_one(
             {"_id": ObjectId(id)}))["id_pessoa"]
 
     @staticmethod
+    # Objetivo: Retornar uma lista contendo todos os e-mails cadastrados
+    # Parâmetros: id: str
+    # Retorno: Lista de str contendo e-mails
     def retornar_emails_existentes(id=None):
         emails = []
         if conn.adocao.pessoa.find().count() > 0:
@@ -146,6 +169,9 @@ class Associado(Pessoa):
         return emails
 
     @staticmethod
+    # Objetivo: Retornar uma lista contendo todos os CPFs cadastrados
+    # Parâmetros: id: str
+    # Retorno: Lista de str contendo CPFs
     def retornar_cpfs_existentes(id=None):
         cpfs = []
         if conn.adocao.associado.find().count() > 0:
@@ -157,6 +183,7 @@ class Associado(Pessoa):
                     Associado.retornar_um_associado(id)["cpf"])
         return cpfs
 
+# Exemplo de esquema
     class Config:
         schema_extra = {
             "example": {
